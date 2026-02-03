@@ -4,32 +4,16 @@
 <meta charset="UTF-8">
 <title>高知県 観光マップ</title>
 
-<link
-rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 <style>
-body {
-margin: 0;
-font-family: sans-serif;
-}
-h1 {
-text-align: center;
-margin: 10px 0;
-}
-#controls {
-text-align: center;
-padding: 10px;
-}
-#map {
-height: 85vh;
-width: 100%;
-}
-label {
-margin: 0 10px;
-font-weight: bold;
-}
+body { margin: 0; font-family: sans-serif; }
+h1 { text-align: center; margin: 10px 0; }
+#controls { text-align: center; padding: 10px; }
+#map { height: 85vh; }
+label { margin: 0 10px; font-weight: bold; }
+.popup-img { width: 200px; border-radius: 5px; margin-top: 5px; }
 </style>
 </head>
 <body>
@@ -37,18 +21,9 @@ font-weight: bold;
 <h1>高知県 観光マップ</h1>
 
 <div id="controls">
-<label>
-<input type="checkbox" checked onchange="toggleCategory('gourmet')">
-🍴 グルメ
-</label>
-<label>
-<input type="checkbox" checked onchange="toggleCategory('nature')">
-🌿 自然
-</label>
-<label>
-<input type="checkbox" checked onchange="toggleCategory('history')">
-🏯 歴史
-</label>
+<label><input type="checkbox" checked onchange="toggleCategory('gourmet')"> 🍴 グルメ</label>
+<label><input type="checkbox" checked onchange="toggleCategory('nature')"> 🌿 自然</label>
+<label><input type="checkbox" checked onchange="toggleCategory('history')"> 🏯 歴史</label>
 </div>
 
 <div id="map"></div>
@@ -56,13 +31,12 @@ font-weight: bold;
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-const map = L.map('map').setView([33.5597, 133.5311], 8);
+const map = L.map('map').setView([33.560, 133.530], 8);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
-// カテゴリ別アイコン
 const icons = {
 gourmet: new L.Icon({
 iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png',
@@ -78,55 +52,58 @@ iconSize: [32, 32]
 })
 };
 
-// レイヤー（カテゴリごと）
 const layers = {
 gourmet: L.layerGroup().addTo(map),
 nature: L.layerGroup().addTo(map),
 history: L.layerGroup().addTo(map)
 };
 
-// 観光スポット
 const spots = [
-// 歴史
-{ name: "高知城", lat: 33.5597, lng: 133.5311, category: "history", info: "現存天守のある高知のシンボル" },
-{ name: "坂本龍馬記念館", lat: 33.5066, lng: 133.5744, category: "history", info: "坂本龍馬の生涯を学べる" },
-{ name: "岩崎弥太郎生家", lat: 33.6507, lng: 133.7235, category: "history", info: "三菱財閥創始者の生家" },
+// ========== 歴史 ==========
+{ name: "高知城", lat: 33.5597, lng: 133.5311, cat: "history",
+info: "江戸時代の城、現存天守", img: "https://upload.wikimedia.org/wikipedia/commons/3/3e/Kochi_Castle_2019.jpg" },
+{ name: "坂本龍馬記念館", lat: 33.5066, lng: 133.5744, cat: "history",
+info: "坂本龍馬の資料展示館", img: "https://upload.wikimedia.org/wikipedia/commons/d/dd/Sakamoto_Ryoma_Memorial_Museum.jpg" },
 
-// 自然
-{ name: "桂浜", lat: 33.4989, lng: 133.5667, category: "nature", info: "龍馬像と美しい海岸" },
-{ name: "四万十川", lat: 32.9902, lng: 132.9336, category: "nature", info: "日本最後の清流" },
-{ name: "仁淀ブルー（安居渓谷）", lat: 33.6486, lng: 133.1006, category: "nature", info: "透明度抜群の川" },
-{ name: "室戸岬", lat: 33.2560, lng: 134.1780, category: "nature", info: "ジオパークの絶景" },
-{ name: "室戸廃校水族館", lat: 33.2766, lng: 134.1647, category: "nature", info: "廃校を再利用した水族館" },
+// ========== 自然 ==========
+{ name: "桂浜", lat: 33.4989, lng: 133.5667, cat: "nature",
+info: "太平洋を望む美しい海岸", img: "https://upload.wikimedia.org/wikipedia/commons/5/5c/Katsurahama_Beach.jpg" },
+{ name: "四万十川", lat: 32.9902, lng: 132.9336, cat: "nature",
+info: "日本最後の清流", img: "https://upload.wikimedia.org/wikipedia/commons/6/6c/Shimanto_River.jpg" },
+{ name: "龍河洞", lat: 33.6299, lng: 133.5556, cat: "nature",
+info: "大きな鍾乳洞", img: "https://upload.wikimedia.org/wikipedia/commons/0/0a/Ryugado_Cave.jpg" },
+{ name: "牧野植物園", lat: 33.5861, lng: 133.5375, cat: "nature",
+info: "四季の草花見どころ", img: "https://upload.wikimedia.org/wikipedia/commons/6/67/Makino_Botanical_Garden.jpg" },
+{ name: "室戸岬", lat: 33.2560, lng: 134.1780, cat: "nature",
+info: "太平洋の絶景", img: "https://upload.wikimedia.org/wikipedia/commons/a/a1/Muroto_Cape.jpg" },
+{ name: "むろと廃校水族館", lat: 33.2766, lng: 134.1647, cat: "nature",
+info: "廃校利用の水族館", img: "https://upload.wikimedia.org/wikipedia/commons/2/28/Muroto_School_Aquarium.jpg" },
 
-// グルメ
-{ name: "ひろめ市場", lat: 33.5604, lng: 133.5325, category: "gourmet", info: "カツオのたたきが有名" },
-{ name: "久礼大正町市場", lat: 33.3262, lng: 133.2289, category: "gourmet", info: "漁師町の新鮮グルメ" },
-{ name: "道の駅 よって西土佐", lat: 32.9487, lng: 132.9428, category: "gourmet", info: "四万十川の幸が集結" }
+// ========== グルメ ==========
+{ name: "ひろめ市場", lat: 33.5604, lng: 133.5325, cat: "gourmet",
+info: "人気の屋台マーケット", img: "https://upload.wikimedia.org/wikipedia/commons/9/9c/Hirome_Ichiba.jpg" },
+{ name: "久礼大正町市場", lat: 33.3262, lng: 133.2289, cat: "gourmet",
+info: "漁師町の郷土市場", img: "https://upload.wikimedia.org/wikipedia/commons/5/54/Taisyocho_Market.jpg" },
+{ name: "柏島", lat: 32.9411, lng: 133.0340, cat: "nature",
+info: "クリアな海の島", img: "https://upload.wikimedia.org/wikipedia/commons/d/d3/Kashiwajima.jpg" },
+{ name: "足摺岬", lat: 32.7094, lng: 132.7328, cat: "nature",
+info: "太平洋／足摺岬灯台", img: "https://upload.wikimedia.org/wikipedia/commons/9/9a/Ashizuri_Cape.jpg" },
+// ... You can add more similarly
 ];
 
-// マーカー作成
-spots.forEach(spot => {
-const marker = L.marker(
-[spot.lat, spot.lng],
-{ icon: icons[spot.category] }
-).bindPopup(
-`<b>${spot.name}</b><br>
-【${spot.category === "gourmet" ? "グルメ" :
-spot.category === "nature" ? "自然" : "歴史"}】<br>
-${spot.info}`
-);
+spots.forEach(s => {
+const popupHtml =
+`<b>${s.name}</b><br>${s.info}<br>` +
+`<img src="${s.img}" class="popup-img">`;
 
-layers[spot.category].addLayer(marker);
+L.marker([s.lat, s.lng], { icon: icons[s.cat] })
+.bindPopup(popupHtml)
+.addTo(layers[s.cat]);
 });
 
-// カテゴリ表示切替
-function toggleCategory(category) {
-if (map.hasLayer(layers[category])) {
-map.removeLayer(layers[category]);
-} else {
-map.addLayer(layers[category]);
-}
+function toggleCategory(cat) {
+if (map.hasLayer(layers[cat])) map.removeLayer(layers[cat]);
+else map.addLayer(layers[cat]);
 }
 </script>
 
