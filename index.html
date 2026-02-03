@@ -1,1 +1,134 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>高知県 観光マップ</title>
 
+<link
+rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<style>
+body {
+margin: 0;
+font-family: sans-serif;
+}
+h1 {
+text-align: center;
+margin: 10px 0;
+}
+#controls {
+text-align: center;
+padding: 10px;
+}
+#map {
+height: 85vh;
+width: 100%;
+}
+label {
+margin: 0 10px;
+font-weight: bold;
+}
+</style>
+</head>
+<body>
+
+<h1>高知県 観光マップ</h1>
+
+<div id="controls">
+<label>
+<input type="checkbox" checked onchange="toggleCategory('gourmet')">
+🍴 グルメ
+</label>
+<label>
+<input type="checkbox" checked onchange="toggleCategory('nature')">
+🌿 自然
+</label>
+<label>
+<input type="checkbox" checked onchange="toggleCategory('history')">
+🏯 歴史
+</label>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+const map = L.map('map').setView([33.5597, 133.5311], 8);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+attribution: '© OpenStreetMap contributors'
+}).addTo(map);
+
+// カテゴリ別アイコン
+const icons = {
+gourmet: new L.Icon({
+iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/red-dot.png',
+iconSize: [32, 32]
+}),
+nature: new L.Icon({
+iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/green-dot.png',
+iconSize: [32, 32]
+}),
+history: new L.Icon({
+iconUrl: 'https://maps.gstatic.com/mapfiles/ms2/micons/blue-dot.png',
+iconSize: [32, 32]
+})
+};
+
+// レイヤー（カテゴリごと）
+const layers = {
+gourmet: L.layerGroup().addTo(map),
+nature: L.layerGroup().addTo(map),
+history: L.layerGroup().addTo(map)
+};
+
+// 観光スポット
+const spots = [
+// 歴史
+{ name: "高知城", lat: 33.5597, lng: 133.5311, category: "history", info: "現存天守のある高知のシンボル" },
+{ name: "坂本龍馬記念館", lat: 33.5066, lng: 133.5744, category: "history", info: "坂本龍馬の生涯を学べる" },
+{ name: "岩崎弥太郎生家", lat: 33.6507, lng: 133.7235, category: "history", info: "三菱財閥創始者の生家" },
+
+// 自然
+{ name: "桂浜", lat: 33.4989, lng: 133.5667, category: "nature", info: "龍馬像と美しい海岸" },
+{ name: "四万十川", lat: 32.9902, lng: 132.9336, category: "nature", info: "日本最後の清流" },
+{ name: "仁淀ブルー（安居渓谷）", lat: 33.6486, lng: 133.1006, category: "nature", info: "透明度抜群の川" },
+{ name: "室戸岬", lat: 33.2560, lng: 134.1780, category: "nature", info: "ジオパークの絶景" },
+{ name: "室戸廃校水族館", lat: 33.2766, lng: 134.1647, category: "nature", info: "廃校を再利用した水族館" },
+
+// グルメ
+{ name: "ひろめ市場", lat: 33.5604, lng: 133.5325, category: "gourmet", info: "カツオのたたきが有名" },
+{ name: "久礼大正町市場", lat: 33.3262, lng: 133.2289, category: "gourmet", info: "漁師町の新鮮グルメ" },
+{ name: "道の駅 よって西土佐", lat: 32.9487, lng: 132.9428, category: "gourmet", info: "四万十川の幸が集結" }
+];
+
+// マーカー作成
+spots.forEach(spot => {
+const marker = L.marker(
+[spot.lat, spot.lng],
+{ icon: icons[spot.category] }
+).bindPopup(
+`<b>${spot.name}</b><br>
+【${spot.category === "gourmet" ? "グルメ" :
+spot.category === "nature" ? "自然" : "歴史"}】<br>
+${spot.info}`
+);
+
+layers[spot.category].addLayer(marker);
+});
+
+// カテゴリ表示切替
+function toggleCategory(category) {
+if (map.hasLayer(layers[category])) {
+map.removeLayer(layers[category]);
+} else {
+map.addLayer(layers[category]);
+}
+}
+</script>
+
+</body>
+</html>
